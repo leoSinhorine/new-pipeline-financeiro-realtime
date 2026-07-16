@@ -1000,7 +1000,7 @@ try:
 
             def col_variacao_func(valor):
                 intensidade = min(abs(valor) / 3, 1)
-                alpha = 0.12 + 0.35 * intensity = alpha
+                alpha = 0.12 + 0.35 * intensity
                 if valor >= 0:
                     return TEMA["cor_var_pos"].format(a=alpha)
                 return TEMA["cor_var_neg"].format(a=alpha)
