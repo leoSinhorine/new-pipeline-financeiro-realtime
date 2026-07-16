@@ -572,6 +572,44 @@ st.markdown(f"""
         padding-top: 1rem;
         border-top: 1px solid {TEMA["hr_color"]};
     }}
+
+    /* ---------- ASSINATURA DO AUTOR ---------- */
+    .assinatura-autor {{
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 0.5rem;
+        font-size: 0.72rem;
+        letter-spacing: 0.4px;
+        color: {TEMA["texto_secundario"]};
+        opacity: 0.75;
+    }}
+    .assinatura-autor .traco {{
+        width: 14px;
+        height: 1px;
+        background: {TEMA["texto_secundario"]};
+        opacity: 0.5;
+        display: inline-block;
+    }}
+    .assinatura-autor .nome {{
+        font-family: 'Sora', sans-serif;
+        font-weight: 700;
+        color: {TEMA["cor_badge_texto"]};
+        opacity: 0.9;
+    }}
+    .assinatura-sidebar {{
+        text-align: center;
+        font-size: 0.68rem;
+        color: {TEMA["texto_secundario"]};
+        opacity: 0.6;
+        letter-spacing: 0.4px;
+        margin-top: 0.3rem;
+    }}
+    .assinatura-sidebar .nome {{
+        color: {TEMA["cor_badge_texto"]};
+        font-weight: 700;
+        opacity: 0.85;
+    }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -710,6 +748,10 @@ try:
         st.markdown("---")
         st.caption(f"🕒 Última atualização dos dados em cache: {datetime.now().strftime('%d/%m/%Y %H:%M')}")
         st.caption("Cache renovado automaticamente a cada 10 minutos.")
+        st.markdown(
+            '<div class="assinatura-sidebar">Desenvolvido por <span class="nome">Leo Sinhorine</span></div>',
+            unsafe_allow_html=True,
+        )
 
     info_moeda = MOEDA_INFO.get(moeda_selecionada, {"icone": "💱", "nome": moeda_selecionada})
     meta_atual = {
@@ -742,6 +784,7 @@ try:
                 <div class="hero-eyebrow">Pipeline ELT · BigQuery + dbt + Streamlit</div>
                 <p class="hero-title">📈 Monitor de Cotações e Médias Móveis</p>
                 <p class="hero-subtitle">Acompanhamento em tempo real de {meta_atual['nome']} com médias móveis de 7 e 30 dias</p>
+                <div class="assinatura-autor"><span class="traco"></span> por <span class="nome">Leo Sinhorine</span></div>
             </div>
             <div class="hero-right">
                 <div class="hero-badge"><span class="pulse-dot"></span> Dados ao vivo</div>
@@ -998,7 +1041,8 @@ try:
     # ---------------- RODAPÉ ----------------
     st.markdown(
         f"<div class='rodape-final'>Pipeline ELT · BigQuery + dbt + Streamlit &nbsp;•&nbsp; "
-        f"Atualizado automaticamente a cada 10 minutos</div>",
+        f"Atualizado automaticamente a cada 10 minutos<br>"
+        f"<span class='assinatura-autor' style='margin-top:0.6rem;'><span class='traco'></span> Desenvolvido por <span class='nome'>Leo Sinhorine</span><span class='traco'></span></span></div>",
         unsafe_allow_html=True,
     )
 
