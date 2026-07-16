@@ -4,6 +4,7 @@ from google.cloud import bigquery
 from google.oauth2 import service_account
 import plotly.graph_objects as go
 from datetime import datetime
+import pytz
 
 
 def hex_para_rgba(cor_hex, alpha=0.13):
@@ -746,7 +747,9 @@ try:
             data_ini = data_fim = datas_disp[0]
 
         st.markdown("---")
-        st.caption(f"🕒 Última atualização dos dados em cache: {datetime.now().strftime('%d/%m/%Y %H:%M')}")
+        fuso_br = pytz.timezone('America/Sao_Paulo')
+        hora_brasilia = datetime.now(fuso_br).strftime('%d/%m/%Y %H:%M')
+        st.caption(f"🕒 Última atualização dos dados em cache: {hora_brasilia}")
         st.caption("Cache renovado automaticamente a cada 10 minutos.")
         st.markdown(
             '<div class="assinatura-sidebar">Desenvolvido por <span class="nome">Leo Sinhorine</span></div>',
