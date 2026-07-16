@@ -20,7 +20,7 @@ st.set_page_config(
     page_title="Monitor de Cotações | Real-time",
     page_icon="📈",
     layout="wide",
-    initial_sidebar_state="collapsed", # Começa fechada no mobile para dar mais espaço
+    initial_sidebar_state="expanded",
 )
 
 # Metadados visuais por moeda (ícone e nome amigável — a cor vem do tema selecionado)
@@ -31,12 +31,20 @@ MOEDA_INFO = {
 }
 
 # =========================================================================
-# 2. INICIALIZAÇÃO DE ESTADOS (SESSION STATE)
+# 2. SELEÇÃO DE TEMA (claro/escuro) — precisa vir antes do CSS
 # =========================================================================
 if "modo_escuro" not in st.session_state:
     st.session_state.modo_escuro = True
 
-# O Tema é configurado dinamicamente antes do CSS ser renderizado
+with st.sidebar:
+    st.markdown("### 🎨 Aparência")
+    st.session_state.modo_escuro = st.toggle(
+        "🌙 Modo escuro",
+        value=st.session_state.modo_escuro,
+        help="Alterne entre o painel escuro e o painel claro",
+    )
+    st.markdown("---")
+
 MODO_ESCURO = st.session_state.modo_escuro
 
 if MODO_ESCURO:
@@ -278,17 +286,6 @@ st.markdown(f"""
         font-size: 1.05rem;
         font-weight: 700;
         color: {TEMA["texto_primario"]};
-    }}
-
-    /* ---------- PAINEL DE FILTROS HORIZONTAL ---------- */
-    .filtro-card {{
-        background: {TEMA["card_bg"]};
-        backdrop-filter: blur(12px);
-        border: 1px solid {TEMA["card_border"]};
-        border-radius: 20px;
-        padding: 1.2rem 1.6rem;
-        margin-bottom: 1.8rem;
-        animation: fadeInUp 0.5s ease-out;
     }}
 
     /* ---------- MINI CARDS (VISÃO GERAL MULTI-MOEDA) ---------- */
@@ -605,14 +602,14 @@ st.markdown(f"""
         text-align: center;
         font-size: 0.68rem;
         color: {TEMA["texto_secundario"]};
-        opacity: 0.7;
+        opacity: 0.6;
         letter-spacing: 0.4px;
         margin-top: 0.3rem;
     }}
     .assinatura-sidebar .nome {{
         color: {TEMA["cor_badge_texto"]};
         font-weight: 700;
-        opacity: 0.9;
+        opacity: 0.85;
     }}
 </style>
 """, unsafe_allow_html=True)
@@ -705,88 +702,60 @@ try:
     with st.spinner("Carregando cotações mais recentes..."):
         df_raw = carregar_dados()
 
-    # ---------------- SIDEBAR DE BRANDING (Elegante e Limpa) ----------------
+    # ---------------- SIDEBAR: FILTROS ----------------
     with st.sidebar:
-        st.markdown("<br>", unsafe_allow_html=True)
-        st.markdown(
-            '<div class="assinatura-sidebar">⚡ <b>Pipeline ELT</b><br>BigQuery + dbt + Streamlit</div>',
-            unsafe_allow_html=True,
+        st.markdown("### ⚙️ Filtros")
+        moedas_disponiveis = list(df_raw["codigo_moeda"].unique())
+        moeda_selecionada = st.selectbox(
+            "Selecione a moeda",
+            moedas_disponiveis,
+            format_func=lambda m: f"{MOEDA_INFO.get(m, {}).get('icone', '💱')}  {m}",
         )
+
+        datas_disp = sorted(df_raw["data_referencia"].unique())
+
+        st.markdown("**Atalhos de período**")
+        col_a, col_b, col_c, col_d = st.columns(4)
+        atalho = None
+        if col_a.button("7d", use_container_width=True):
+            atalho = 7
+        if col_b.button("30d", use_container_width=True):
+            atalho = 30
+        if col_c.button("90d", use_container_width=True):
+            atalho = 90
+        if col_d.button("Tudo", use_container_width=True):
+            atalho = None if len(datas_disp) <= 1 else -1
+
+        if "periodo_ini" not in st.session_state:
+            st.session_state.periodo_ini = datas_disp[0]
+            st.session_state.periodo_fim = datas_disp[-1]
+
+        if atalho == -1:
+            st.session_state.periodo_ini = datas_disp[0]
+            st.session_state.periodo_fim = datas_disp[-1]
+        elif atalho is not None and len(datas_disp) > atalho:
+            st.session_state.periodo_ini = datas_disp[-atalho]
+            st.session_state.periodo_fim = datas_disp[-1]
+
+        if len(datas_disp) > 1:
+            data_ini, data_fim = st.select_slider(
+                "Período de análise",
+                options=datas_disp,
+                value=(st.session_state.periodo_ini, st.session_state.periodo_fim),
+            )
+        else:
+            data_ini = data_fim = datas_disp[0]
+
         st.markdown("---")
+        fuso_br = pytz.timezone('America/Sao_Paulo')
+        hora_brasilia = datetime.now(fuso_br).strftime('%d/%m/%Y %H:%M')
+        st.caption(f"🕒 Última atualização dos dados em cache: {hora_brasilia}")
+        st.caption("Cache renovado automaticamente a cada 10 minutos.")
         st.markdown(
-            '<div class="assinatura-sidebar">👨‍💻 Desenvolvido por:<br><span class="nome" style="font-size: 1rem;">Leo Sinhorine</span></div>',
+            '<div class="assinatura-sidebar">Desenvolvido por <span class="nome">Leo Sinhorine</span></div>',
             unsafe_allow_html=True,
         )
 
-    # ---------------- HERO / CABEÇALHO ----------------
-    # Definimos valores temporários para a variação antes da renderização do Hero
-    moedas_disponiveis = list(df_raw["codigo_moeda"].unique())
-    
-    # ---------------- PAINEL DE CONTROLE DE FILTROS (HORIZONTAL NO TOPO) ----------------
-    st.markdown('<p class="section-title">⚙️ Painel de Controle</p>', unsafe_allow_html=True)
-    
-    with st.container():
-        st.markdown('<div class="filtro-card">', unsafe_allow_html=True)
-        col_moeda, col_periodo, col_tema = st.columns([1.5, 2.5, 1], gap="medium")
-        
-        with col_moeda:
-            moeda_selecionada = st.selectbox(
-                "Selecione a Moeda",
-                moedas_disponiveis,
-                format_func=lambda m: f"{MOEDA_INFO.get(m, {}).get('icone', '💱')}  {m}",
-            )
-            
-        with col_periodo:
-            datas_disp = sorted(df_raw["data_referencia"].unique())
-            
-            # Atalhos rápidos de período
-            col_a, col_b, col_c, col_d = st.columns(4)
-            atalho = None
-            if col_a.button("7 dias", use_container_width=True):
-                atalho = 7
-            if col_b.button("30 dias", use_container_width=True):
-                atalho = 30
-            if col_c.button("90 dias", use_container_width=True):
-                atalho = 90
-            if col_d.button("Tudo", use_container_width=True):
-                atalho = None if len(datas_disp) <= 1 else -1
-
-            if "periodo_ini" not in st.session_state:
-                st.session_state.periodo_ini = datas_disp[0]
-                st.session_state.periodo_fim = datas_disp[-1]
-
-            if atalho == -1:
-                st.session_state.periodo_ini = datas_disp[0]
-                st.session_state.periodo_fim = datas_disp[-1]
-            elif atalho is not None and len(datas_disp) > atalho:
-                st.session_state.periodo_ini = datas_disp[-atalho]
-                st.session_state.periodo_fim = datas_disp[-1]
-
-            if len(datas_disp) > 1:
-                data_ini, data_fim = st.select_slider(
-                    "Período de Análise",
-                    options=datas_disp,
-                    value=(st.session_state.periodo_ini, st.session_state.periodo_fim),
-                    label_visibility="collapsed"
-                )
-            else:
-                data_ini = data_fim = datas_disp[0]
-                
-        with col_tema:
-            st.markdown("<p style='font-size:0.85rem; font-weight:500; margin-bottom: 0.6rem;'>Aparência</p>", unsafe_allow_html=True)
-            # Ao alterar o toggle, mudamos o estado do modo escuro e recarregamos a página
-            st.session_state.modo_escuro = st.toggle(
-                "🌙 Modo escuro",
-                value=st.session_state.modo_escuro,
-                help="Alterne instantaneamente entre o painel escuro e claro",
-            )
-            # Força o Streamlit a redesenhar a tela com o novo tema se o toggle mudar
-            if st.session_state.modo_escuro != MODO_ESCURO:
-                st.rerun()
-                
-        st.markdown('</div>', unsafe_allow_html=True)
-
-    # ---------------- PROCESSAMENTO DE DADOS FILTRADOS ----------------
     info_moeda = MOEDA_INFO.get(moeda_selecionada, {"icone": "💱", "nome": moeda_selecionada})
     meta_atual = {
         "icone": info_moeda["icone"],
@@ -794,6 +763,7 @@ try:
         "cor": TEMA["cor_moeda"].get(moeda_selecionada, COR_PADRAO),
     }
 
+    # ---------------- FILTRAGEM ----------------
     df_filtrado = df_raw[
         (df_raw["codigo_moeda"] == moeda_selecionada) &
         (df_raw["data_referencia"] >= data_ini) &
@@ -809,7 +779,7 @@ try:
     else:
         max_periodo = min_periodo = variacao_periodo = 0.0
 
-    # ---------------- HERO / CABEÇALHO COM METRICAS DINÂMICAS ----------------
+    # ---------------- HERO / CABEÇALHO ----------------
     sinal_periodo = "+" if variacao_periodo >= 0 else ""
     st.markdown(f"""
         <div class="hero-wrap">
@@ -857,7 +827,7 @@ try:
     st.markdown("<br>", unsafe_allow_html=True)
 
     if df_filtrado.empty:
-        st.warning("Nenhum data encontrado para o período e moeda selecionados.")
+        st.warning("Nenhum dado encontrado para o período e moeda selecionados.")
     else:
         ultimo_registro = df_filtrado.iloc[-1]
         variacao = ultimo_registro['variacao_diaria_pct']
@@ -1041,7 +1011,7 @@ try:
                 for _, linha in df.iterrows():
                     celulas = []
                     for col in colunas:
-                        valor = inline_value = linha[col]
+                        valor = linha[col]
                         if col == 'Data':
                             celulas.append(f'<td class="col-data">{valor}</td>')
                         elif col == 'Variação (%)':
@@ -1072,11 +1042,9 @@ try:
             )
 
     # ---------------- RODAPÉ ----------------
-    fuso_br = pytz.timezone('America/Sao_Paulo')
-    hora_brasilia = datetime.now(fuso_br).strftime('%d/%m/%Y %H:%M')
     st.markdown(
         f"<div class='rodape-final'>Pipeline ELT · BigQuery + dbt + Streamlit &nbsp;•&nbsp; "
-        f"Última atualização: {hora_brasilia} (Fuso Brasília)<br>"
+        f"Atualizado automaticamente a cada 10 minutos<br>"
         f"<span class='assinatura-autor' style='margin-top:0.6rem;'><span class='traco'></span> Desenvolvido por <span class='nome'>Leo Sinhorine</span><span class='traco'></span></span></div>",
         unsafe_allow_html=True,
     )
