@@ -748,12 +748,10 @@ try:
         st.markdown("---")
         st.caption(f"🕒 Última atualização dos dados em cache: {datetime.now().strftime('%d/%m/%Y %H:%M')}")
         st.caption("Cache renovado automaticamente a cada 10 minutos.")
-        st.markdown("---")
-        import pytz
-        fuso_br = pytz.timezone('America/Sao_Paulo')
-        hora_brasilia = datetime.now(fuso_br).strftime('%d/%m/%Y %H:%M')
-        st.caption(f"🕒 Última atualização dos dados em cache: {hora_brasilia}")
-        st.caption("Cache renovado automaticamente a cada 10 minutos.")
+        st.markdown(
+            '<div class="assinatura-sidebar">Desenvolvido por <span class="nome">Leo Sinhorine</span></div>',
+            unsafe_allow_html=True,
+        )
 
     info_moeda = MOEDA_INFO.get(moeda_selecionada, {"icone": "💱", "nome": moeda_selecionada})
     meta_atual = {
