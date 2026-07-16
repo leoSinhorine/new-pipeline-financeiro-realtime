@@ -20,7 +20,7 @@ st.set_page_config(
     page_title="Monitor de Cotações | Real-time",
     page_icon="📈",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="auto",
 )
 
 # Metadados visuais por moeda (ícone e nome amigável — a cor vem do tema selecionado)
@@ -521,11 +521,14 @@ st.markdown(f"""
     .tabela-scroll {{
         max-height: 460px;
         overflow-y: auto;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
         border-radius: 16px;
         border: 1px solid {TEMA["df_border"]};
     }}
     table.tabela-cotacoes {{
         width: 100%;
+        min-width: 620px;
         border-collapse: collapse;
         font-family: 'JetBrains Mono', monospace;
         font-size: 0.85rem;
@@ -610,6 +613,92 @@ st.markdown(f"""
         color: {TEMA["cor_badge_texto"]};
         font-weight: 700;
         opacity: 0.85;
+    }}
+
+    /* =====================================================================
+       4. RESPONSIVIDADE MOBILE — telas até 768px (celulares e tablets pequenos)
+       ===================================================================== */
+    @media (max-width: 768px) {{
+
+        .block-container {{
+            padding-top: 0.9rem;
+            padding-left: 0.9rem;
+            padding-right: 0.9rem;
+        }}
+
+        /* Hero: empilha em coluna e reduz respiro/tamanhos */
+        .hero-wrap {{
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 1.3rem 1.3rem;
+            border-radius: 18px;
+            gap: 0.9rem;
+        }}
+        .hero-eyebrow {{ font-size: 0.62rem; }}
+        .hero-title {{ font-size: 1.4rem; letter-spacing: -0.3px; }}
+        .hero-subtitle {{ font-size: 0.82rem; }}
+        .hero-right {{
+            align-items: flex-start;
+            width: 100%;
+        }}
+        .hero-badge {{ font-size: 0.72rem; padding: 5px 12px; }}
+        .hero-stats {{
+            width: 100%;
+            justify-content: space-between;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }}
+        .hero-stat {{ text-align: left; }}
+        .hero-stat-label {{ font-size: 0.6rem; }}
+        .hero-stat-value {{ font-size: 0.88rem; }}
+
+        /* Título de seção mais compacto */
+        .section-title {{ font-size: 1.02rem; margin: 0.2rem 0 0.7rem 0; }}
+        .section-sub {{ font-size: 0.78rem; }}
+
+        /* Mini cards de visão geral do mercado */
+        .mini-card {{
+            padding: 0.75rem 0.85rem;
+            border-radius: 14px;
+        }}
+        .mini-card-icon {{ width: 32px; height: 32px; font-size: 1.05rem; border-radius: 10px; }}
+        .mini-card-nome {{ font-size: 0.62rem; }}
+        .mini-card-valor {{ font-size: 0.92rem; }}
+        .mini-card-delta {{ font-size: 0.72rem; padding: 3px 7px; }}
+
+        /* Cards de KPI */
+        .kpi-card {{ padding: 1rem 1.1rem; border-radius: 16px; }}
+        .kpi-icon {{ width: 32px; height: 32px; font-size: 1.05rem; margin-bottom: 0.4rem; }}
+        .kpi-label {{ font-size: 0.7rem; }}
+        .kpi-value {{ font-size: 1.35rem; }}
+        .kpi-delta-up, .kpi-delta-down {{ font-size: 0.76rem; }}
+
+        /* Botões de atalho de período (7d/30d/90d/Tudo) mais compactos */
+        .stButton > button {{
+            padding: 0.35rem 0.4rem !important;
+            font-size: 0.78rem !important;
+        }}
+
+        /* Tabela: fonte menor e permite rolagem horizontal por toque */
+        table.tabela-cotacoes {{
+            font-size: 0.74rem;
+            min-width: 560px;
+        }}
+        table.tabela-cotacoes td, table.tabela-cotacoes thead th {{
+            padding: 8px 10px;
+        }}
+        .tabela-scroll {{ max-height: 380px; }}
+
+        .rodape-final {{ font-size: 0.72rem; }}
+    }}
+
+    /* Telas muito estreitas (celulares menores, ~360-400px) */
+    @media (max-width: 420px) {{
+        .hero-title {{ font-size: 1.2rem; }}
+        .hero-stats {{ gap: 0.4rem; }}
+        .hero-stat-value {{ font-size: 0.8rem; }}
+        .kpi-value {{ font-size: 1.15rem; }}
+        .mini-card-valor {{ font-size: 0.82rem; }}
     }}
 </style>
 """, unsafe_allow_html=True)
@@ -928,24 +1017,25 @@ try:
                 yaxis_title="Preço (R$)",
                 legend=dict(
                     orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1,
-                    font=dict(color=TEMA["plot_font_color"], size=12),
+                    font=dict(color=TEMA["plot_font_color"], size=11),
                 ),
-                margin=dict(l=10, r=10, t=40, b=10),
-                height=480,
+                margin=dict(l=6, r=6, t=36, b=6),
+                height=380,
                 hovermode="x unified",
                 font=dict(family="Inter, sans-serif", color=TEMA["plot_font_color"]),
                 xaxis=dict(
                     type='category',
                     showgrid=False,
-                    tickfont=dict(color=TEMA["plot_font_color"]),
+                    tickfont=dict(color=TEMA["plot_font_color"], size=9),
                     linecolor=TEMA["grid_color"],
                     rangeslider=dict(visible=False),
+                    nticks=6,
                 ),
                 yaxis=dict(
                     showgrid=True,
                     gridcolor=TEMA["grid_color"],
-                    tickfont=dict(color=TEMA["plot_font_color"]),
-                    title=dict(font=dict(color=TEMA["plot_font_color"])),
+                    tickfont=dict(color=TEMA["plot_font_color"], size=10),
+                    title=dict(font=dict(color=TEMA["plot_font_color"], size=11)),
                 ),
                 hoverlabel=dict(
                     bgcolor=TEMA["hover_bg"],
@@ -954,7 +1044,7 @@ try:
                 transition=dict(duration=400, easing="cubic-in-out"),
             )
 
-            st.plotly_chart(fig, use_container_width=True, config={"displaylogo": False})
+            st.plotly_chart(fig, use_container_width=True, config={"displaylogo": False, "scrollZoom": False})
 
             # --- Mini gráfico de volatilidade (variação diária %) ---
             st.markdown('<p class="section-title" style="font-size:1rem;">⚡ Volatilidade Diária</p>', unsafe_allow_html=True)
@@ -973,17 +1063,18 @@ try:
                 template=TEMA["plotly_template"],
                 plot_bgcolor="rgba(0,0,0,0)",
                 paper_bgcolor="rgba(0,0,0,0)",
-                height=180,
-                margin=dict(l=10, r=10, t=10, b=10),
+                height=150,
+                margin=dict(l=6, r=6, t=6, b=6),
                 showlegend=False,
-                xaxis=dict(type='category', showgrid=False, tickfont=dict(color=TEMA["plot_font_color"], size=9)),
-                yaxis=dict(showgrid=True, gridcolor=TEMA["grid_color"], tickfont=dict(color=TEMA["plot_font_color"]), title="%"),
+                xaxis=dict(type='category', showgrid=False, tickfont=dict(color=TEMA["plot_font_color"], size=8), nticks=6),
+                yaxis=dict(showgrid=True, gridcolor=TEMA["grid_color"], tickfont=dict(color=TEMA["plot_font_color"], size=9), title="%"),
                 font=dict(family="Inter, sans-serif", color=TEMA["plot_font_color"]),
             )
-            st.plotly_chart(fig_vol, use_container_width=True, config={"displaylogo": False})
+            st.plotly_chart(fig_vol, use_container_width=True, config={"displaylogo": False, "scrollZoom": False})
 
         with aba_tabela:
             st.markdown('<p class="section-title">Tabela Consolidada (One Big Table)</p>', unsafe_allow_html=True)
+            st.caption("↔️ Arraste para os lados para ver todas as colunas")
 
             df_exibicao = df_filtrado[[
                 'data_referencia', 'cotacao_compra', 'cotacao_venda',
@@ -1039,6 +1130,7 @@ try:
                 data=csv,
                 file_name=f"cotacoes_{moeda_selecionada}_{datetime.now().strftime('%Y%m%d')}.csv",
                 mime="text/csv",
+                use_container_width=True,
             )
 
     # ---------------- RODAPÉ ----------------
