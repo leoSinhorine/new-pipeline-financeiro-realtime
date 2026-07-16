@@ -1,0 +1,54 @@
+version: 2
+
+models:
+  # --- TABELA 1: FATO COTACÕES ---
+  - name: fct_cotacoes
+    description: "Tabela fato unificada de cotações diárias de moedas estrangeiras (USD, EUR, BTC) em relação ao BRL."
+    columns:
+      - name: cotacao_key
+        description: "Chave primária surrogate gerada para cada registro."
+        tests:
+          - unique
+          - not_null
+
+      - name: data_referencia
+        description: "Data da cotação (campo usado para particionamento)."
+        tests:
+          - not_null
+
+      - name: codigo_moeda
+        description: "Código de identificação da moeda (ex: USD, EUR, BTC)."
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['USD', 'EUR', 'BTC']
+
+      - name: cotacao_compra
+        description: "Valor de compra da cotação."
+        tests:
+          - not_null
+
+  # --- TABELA 2: DIMENSÃO TEMPO ---
+  - name: dim_tempo
+    description: "Tabela dimensão de tempo/calendário contínua para suporte a análises temporais enriquecidas."
+    columns:
+      - name: data_dia
+        description: "Chave primária da dimensão (Data)."
+        tests:
+          - unique
+          - not_null
+
+  # --- TABELA 3: ONE BIG TABLE ANALÍTICA (ENTREGA) ---
+  - name: obt_cotacoes_analitico
+    description: "Tabela final de entrega (OBT) contendo dados de cotações consolidados, enriquecidos com a dimensão tempo e com KPIs de negócios pré-calculados."
+    columns:
+      - name: cotacao_key
+        description: "Chave primária surrogate herdada da fato."
+        tests:
+          - unique
+          - not_null
+
+      - name: codigo_moeda
+        description: "Moeda correspondente ao registro."
+        tests:
+          - not_null

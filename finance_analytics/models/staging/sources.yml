@@ -1,0 +1,13 @@
+version: 2
+
+sources:
+  - name: raw
+    database: finance-analytics-engineering  # Altere se o ID do seu projeto for diferente
+    schema: raw_data
+    tables:
+      - name: raw_usdbrl
+        description: "Tabela bruta de cotações diárias de USD/BRL oriunda da AwesomeAPI"
+      - name: raw_eurbrl
+        description: "Tabela bruta de cotações diárias de EUR/BRL oriunda da AwesomeAPI"
+      - name: raw_btcbrl
+        description: "Tabela bruta de cotações diárias de BTC/BRL oriunda da AwesomeAPI"
