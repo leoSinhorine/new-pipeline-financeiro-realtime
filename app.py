@@ -611,36 +611,6 @@ st.markdown(f"""
         font-weight: 700;
         opacity: 0.85;
     }}
-
-    /* ---------- FIX DE INJEÇÃO DO HAMBÚRGUER MOBILE ---------- */
-    @media (max-width: 768px) {{
-        /* Localiza e destaca o botão nativo da barra lateral oculta no mobile */
-        button[data-testid="stSidebarCollapse__Component"] {{
-            background: {TEMA["card_bg"]} !important;
-            border: 1px solid {TEMA["cor_badge_borda"]} !important;
-            box-shadow: 0 0 12px {hex_para_rgba(TEMA["cor_badge_texto"], 0.4)} !important;
-            border-radius: 12px !important;
-            left: 12px !important;
-            top: 12px !important;
-            width: 44px !important;
-            height: 44px !important;
-            z-index: 999999 !important;
-            position: fixed !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            transition: all 0.3s ease !important;
-        }}
-        button[data-testid="stSidebarCollapse__Component"] svg {{
-            fill: {TEMA["cor_badge_texto"]} !important;
-            width: 22px !important;
-            height: 22px !important;
-        }}
-        /* Empurra o container principal um pouco para baixo para não sobrepor o botão */
-        .block-container {{
-            padding-top: 3.5rem !important;
-        }}
-    }}
 </style>
 """, unsafe_allow_html=True)
 
