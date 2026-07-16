@@ -143,7 +143,15 @@ st.markdown(f"""
 
     #MainMenu {{visibility: hidden;}}
     footer {{visibility: hidden;}}
-    header {{visibility: hidden;}}
+    
+    /* MODIFICADO: Remove o fundo cinza do cabeçalho sem sumir com os botões nativos */
+    header[data-testid="stHeader"] {{
+        background-color: transparent !important;
+        background: transparent !important;
+    }}
+    header[data-testid="stHeader"] [data-testid="stAppDeployButton"] {{
+        display: none !important;
+    }}
 
     @keyframes fadeInUp {{
         from {{ opacity: 0; transform: translateY(14px); }}
@@ -612,9 +620,9 @@ st.markdown(f"""
         opacity: 0.85;
     }}
 
-    /* ---------- BOTÃO HAMBÚRGUER CUSTOMIZADO PARA CELULAR (ABRIR / VOLTAR) ---------- */
+    /* ---------- ESTILIZAÇÃO COMPLETA DO BOTÃO HAMBÚRGUER MOBILE (ABRIR / VOLTAR) ---------- */
     @media (max-width: 991px) {{
-        /* 1. Botão de Abrir (quando a barra lateral está fechada/colapsada) */
+        /* Botão de Abrir (quando a barra lateral está recolhida) */
         div[data-testid="collapsedControl"] {{
             background: {TEMA["card_bg"]} !important;
             border: 1px solid {TEMA["cor_badge_borda"]} !important;
@@ -635,7 +643,7 @@ st.markdown(f"""
             color: {TEMA["cor_badge_texto"]} !important;
         }}
 
-        /* 2. Botão de Voltar/Fechar (quando a barra lateral está aberta/expandida) */
+        /* Botão de Voltar/Fechar (quando a barra lateral está expandida) */
         button[data-testid="stSidebarCollapse__Component"] {{
             background: {TEMA["card_bg"]} !important;
             border: 1px solid {TEMA["cor_badge_borda"]} !important;
@@ -658,7 +666,7 @@ st.markdown(f"""
             height: 22px !important;
         }}
 
-        /* Empurra ligeiramente a aplicação para baixo para não cobrir o cabeçalho no mobile */
+        /* Afasta a interface principal para não colidir com o botão flutuante fixo no mobile */
         .block-container {{
             padding-top: 4rem !important;
         }}
@@ -1060,10 +1068,10 @@ try:
             def renderizar_tabela_html(df):
                 colunas = df.columns.tolist()
                 linhas_html = []
-                for _, linha in df.iterrows():
+                for _, inline_value in df.iterrows():
                     celulas = []
                     for col in colunas:
-                        valor = linha[col]
+                        valor = inline_value[col]
                         if col == 'Data':
                             celulas.append(f'<td class="col-data">{valor}</td>')
                         elif col == 'Variação (%)':
