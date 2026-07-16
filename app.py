@@ -130,7 +130,7 @@ COR_PADRAO = TEMA["cor_moeda"]["USD"]
 st.markdown(f"""
 <style>
 
-    @import url('https://fonts.googleapis.com/css2?family=Sora:wght=600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
 
     html, body, [class*="css"] {{
         font-family: 'Inter', sans-serif;
@@ -598,7 +598,7 @@ st.markdown(f"""
         color: {TEMA["cor_badge_texto"]};
         opacity: 0.9;
     }}
-    .assinatura-sidebar {{
+    .stMarkdown .assinatura-sidebar, .assinatura-sidebar {{
         text-align: center;
         font-size: 0.68rem;
         color: {TEMA["texto_secundario"]};
@@ -606,15 +606,15 @@ st.markdown(f"""
         letter-spacing: 0.4px;
         margin-top: 0.3rem;
     }}
-    .assinatura-sidebar .nome {{
+    .stMarkdown .assinatura-sidebar .nome, .assinatura-sidebar .nome {{
         color: {TEMA["cor_badge_texto"]};
         font-weight: 700;
         opacity: 0.85;
     }}
 
-    /* ---------- BOTÃO HAMBÚRGUER CUSTOMIZADO PARA CELULAR ---------- */
+    /* ---------- BOTÃO HAMBÚRGUER CUSTOMIZADO PARA CELULAR (ABRIR / VOLTAR) ---------- */
     @media (max-width: 991px) {{
-        /* Captura o elemento colapsado nativo e força ele a ficar visível e estilizado como hambúrguer */
+        /* 1. Botão de Abrir (quando a barra lateral está fechada/colapsada) */
         div[data-testid="collapsedControl"] {{
             background: {TEMA["card_bg"]} !important;
             border: 1px solid {TEMA["cor_badge_borda"]} !important;
@@ -634,7 +634,31 @@ st.markdown(f"""
         div[data-testid="collapsedControl"] button {{
             color: {TEMA["cor_badge_texto"]} !important;
         }}
-        /* Empurra ligeiramente a aplicação para baixo para não ficar debaixo do hambúrguer fixo */
+
+        /* 2. Botão de Voltar/Fechar (quando a barra lateral está aberta/expandida) */
+        button[data-testid="stSidebarCollapse__Component"] {{
+            background: {TEMA["card_bg"]} !important;
+            border: 1px solid {TEMA["cor_badge_borda"]} !important;
+            box-shadow: 0 4px 14px {hex_para_rgba(TEMA["cor_badge_texto"], 0.35)} !important;
+            border-radius: 12px !important;
+            left: 15px !important;
+            top: 15px !important;
+            width: 44px !important;
+            height: 44px !important;
+            position: fixed !important;
+            z-index: 9999999 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            transition: all 0.3s ease !important;
+        }}
+        button[data-testid="stSidebarCollapse__Component"] svg {{
+            fill: {TEMA["cor_badge_texto"]} !important;
+            width: 22px !important;
+            height: 22px !important;
+        }}
+
+        /* Empurra ligeiramente a aplicação para baixo para não cobrir o cabeçalho no mobile */
         .block-container {{
             padding-top: 4rem !important;
         }}
