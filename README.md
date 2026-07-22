@@ -84,4 +84,8 @@ pip install -r requirements.txt
 python scripts/extracao_financeira.py
 
 # Iniciar o painel interativo do Streamlit
+<<<<<<< HEAD
 streamlit run app.py
+=======
+streamlit run app.py
+>>>>>>> 0271a49d50dd871f37b8e852dde7d874867fd9f8
